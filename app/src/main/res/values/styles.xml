@@ -1,0 +1,40 @@
+<resources>
+    <!-- Define custom dialog animation -->
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+    </style>
+
+
+    <style name="MyFloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="backgroundTint">@color/green</item>
+        <!-- Optionally set border or elevation if needed -->
+        <item name="elevation">4dp</item>
+        <item name="borderWidth">0dp</item>
+    </style>
+    <style name="CustomHighBold"
+        ><item name="android:fontFamily">@font/circularstd_black</item>
+    </style>
+    <style name="CustomLowBold">
+        <item name="android:fontFamily">@font/circularstd_bold</item>
+    </style>
+    <style name="CustomLow"
+        >
+        <item name="android:fontFamily">@font/circularstd_book</item>
+    </style>
+    <style name="CustomMedium">
+        <item name="android:fontFamily">@font/circularstd_medium</item>
+    </style>
+    <style name="RoundedTopCornersImage" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">16dp</item> <!-- Adjust the corner radius as needed -->
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">16dp</item>
+        <item name="cornerSizeBottomRight">16dp</item>
+    </style>
+
+
+</resources>
+
+
+    <!-- res/values/styles.xml -->

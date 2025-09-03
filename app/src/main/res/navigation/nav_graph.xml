@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.myjournalappfinal.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" >
+        <!-- ACTION 1: To start creating a journal -->
+        <action
+            android:id="@+id/action_homeFragment_to_questionsPreferenceFragment"
+            app:destination="@id/questionsPreferenceFragment" />
+        <!-- ACTION 2: To edit an existing journal -->
+        <action
+            android:id="@+id/action_homeFragment_to_updateJournalFragment"
+            app:destination="@id/updateJournalFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/questionsFragment"
+        android:name="com.example.myjournalappfinal.QuestionsFragment"
+        android:label="fragment_questions"
+        tools:layout="@layout/fragment_questions" />
+    <fragment
+        android:id="@+id/imageUploadFragment"
+        android:name="com.example.myjournalappfinal.ImageUploadFragment"
+        android:label="fragment_image_upload"
+        tools:layout="@layout/fragment_image_upload">
+        <action
+            android:id="@+id/action_imageUploadFragment_to_questionsFragment"
+            app:destination="@id/questionsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/questionsPreferenceFragment"
+        android:name="com.example.myjournalappfinal.QuestionsPreferenceFragment"
+        android:label="QuestionsPreferenceFragment" >
+        <action
+            android:id="@+id/action_questionsPreferenceFragment_to_imageUploadFragment"
+            app:destination="@id/imageUploadFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/updateJournalFragment"
+        android:name="com.example.myjournalappfinal.UpdateJournalFragment"
+        android:label="fragment_update_journal"
+        tools:layout="@layout/fragment_update_journal" >
+        <argument
+            android:name="journalEntry"
+            app:argType="com.example.myjournalappfinal.JournalEntry" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.myjournalappfinal.ProfileFragment"
+        android:label="fragment_profile"
+        tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/insightFragment"
+        android:name="com.example.myjournalappfinal.InsightFragment"
+        android:label="fragment_insight"
+        tools:layout="@layout/fragment_insight" />
+</navigation>
+
