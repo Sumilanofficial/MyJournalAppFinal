@@ -1,5 +1,5 @@
 ________________________________________
-📔✨ My Journal App: Your AI-Powered Journal
+📔✨ My Journal App: Your AI-Powered Journal(Project is build Completely by me)
 ________________________________________
 Transform your daily thoughts into beautiful, insightful narratives.
 Struggle with writer's block or finding the time to journal? My Journal App is a modern Android application that redefines daily reflection. It uses the power of Generative AI to turn your simple, guided answers into rich, narrative-style entries. It's your personal, secure space to capture thoughts, track growth, and uncover meaningful insights about your life, effortlessly.
