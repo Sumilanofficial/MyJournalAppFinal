@@ -8,9 +8,9 @@ class MyJournalApp : Application() {
         super.onCreate()
         // Initialize Cloudinary
         val config = mapOf(
-            "cloud_name" to "dwhv4gi2w",
-            "api_key" to "592795373161672",
-            "api_secret" to "MxXS93RfRi5XHJ8n3eakcR_c6_Q"
+            "cloud_name" to "",
+            "api_key" to "",
+            "api_secret" to ""
         )
         MediaManager.init(this, config)
     }
