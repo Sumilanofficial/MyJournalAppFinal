@@ -1,4 +1,4 @@
-package com.example.myjournalappfinal
+package com.example.myjournalappfinal.Models
 
 /**
  * Data class to represent a single question entity.

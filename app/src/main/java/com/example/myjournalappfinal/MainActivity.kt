@@ -7,7 +7,9 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.myjournalappfinal.databinding.ActivityMainBinding
@@ -22,6 +24,8 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        // ✅ IMPORTANT: This enables edge-to-edge display
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 //        binding?.logoutButton?.setOnClickListener {
 //            auth.signOut() // logout from Firebase
 //            Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show()
@@ -29,6 +33,14 @@ class MainActivity : AppCompatActivity() {
 //            startActivity(Intent(this, LoginActivity::class.java))
 //            finish() // close MainActivity so user can’t go back
 //        }
+        // ✅ NEW: This listener handles the insets for the BottomNavigationView
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bottomNavigation) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Apply the bottom inset as padding to the bottom navigation view
+            view.updatePadding(bottom = insets.bottom)
+            windowInsets
+        }
+
 
         val navHostFragment = binding?.fragmentContainerView?.id?.let {
             supportFragmentManager.findFragmentById(
@@ -41,6 +53,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         auth = FirebaseAuth.getInstance()
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
@@ -61,10 +74,10 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.bottom_insight ->
                     navController.navigate(R.id.insightFragment)
-//
-//                R.id.bottom_jouranals ->
-//                    navController.navigate(R.id.journalsFragment)
-//
+
+                R.id.bottom_jouranals ->
+                    navController.navigate(R.id.allJournal)
+
                 R.id.bottom_profile ->
                     navController.navigate(R.id.profileFragment)
 
@@ -74,7 +87,7 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.homeFragment,
-//                R.id.journalsFragment,
+                R.id.allJournal,
                 R.id.insightFragment,
                 R.id.profileFragment
                     -> {

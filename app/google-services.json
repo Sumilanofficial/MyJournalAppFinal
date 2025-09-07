@@ -12,7 +12,20 @@
           "package_name": "com.example.myjournalappfinal"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "937802809670-5qdjo2rrfrj82eatkm9th6vi1mr4b56i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myjournalappfinal",
+            "certificate_hash": "65370172008da792074fe36cf603dd42907ba170"
+          }
+        },
+        {
+          "client_id": "937802809670-e1a694mf1lkigq57ussq49trdruk140l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCjTIJVBMloqiGBZwj4MDY1bfSjlW3AuNM"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "937802809670-e1a694mf1lkigq57ussq49trdruk140l.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

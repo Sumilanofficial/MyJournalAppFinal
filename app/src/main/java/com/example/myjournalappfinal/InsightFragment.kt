@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
+import com.example.myjournalappfinal.Models.JournalEntry
 import com.example.myjournalappfinal.databinding.FragmentInsightBinding
 
 import com.google.firebase.Firebase
@@ -64,7 +65,7 @@ class InsightFragment : Fragment() {
                 if (documents != null && !documents.isEmpty) {
                     allEntries = documents.toObjects(JournalEntry::class.java)
                     // Once all entries are fetched, find the "On This Day" memory
-                    findOnThisDayEntry()
+//                    findOnThisDayEntry()
                 }
             }
             .addOnFailureListener { e ->
@@ -76,32 +77,40 @@ class InsightFragment : Fragment() {
         val today = Calendar.getInstance()
         val currentDay = today.get(Calendar.DAY_OF_MONTH)
         val currentMonth = today.get(Calendar.MONTH)
+        val currentYear = today.get(Calendar.YEAR)
 
         val memory = allEntries.find { entry ->
-            val entryDate = Calendar.getInstance()
-            entry.timestamp?.let { entryDate.time = it }
+            // Safely handle nullable timestamp
+            entry.timestamp?.let {
+                val entryDate = Calendar.getInstance().apply { time = it }
+                val entryDay = entryDate.get(Calendar.DAY_OF_MONTH)
+                val entryMonth = entryDate.get(Calendar.MONTH)
+                val entryYear = entryDate.get(Calendar.YEAR)
 
-            val entryDay = entryDate.get(Calendar.DAY_OF_MONTH)
-            val entryMonth = entryDate.get(Calendar.MONTH)
-            val isSameDayAndMonth = entryDay == currentDay && entryMonth == currentMonth
-            val isPastYear = entryDate.get(Calendar.YEAR) < today.get(Calendar.YEAR)
-
-            isSameDayAndMonth && isPastYear
+                // Check if it's the same day and month, but from a past year
+                entryDay == currentDay && entryMonth == currentMonth && entryYear < currentYear
+            } ?: false // If timestamp is null, it's not a match
         }
 
-        if (memory != null) {
-            binding?.tvOnThisDayEmpty?.isVisible = false
-            binding?.tvOnThisDayTitle?.text = memory.title
-            binding?.tvOnThisDayDate?.text = memory.entryDate
-            binding?.tvOnThisDaySnippet?.text = memory.storyContent
-        } else {
-            binding?.tvOnThisDayTitle?.isVisible = false
-            binding?.tvOnThisDayDate?.isVisible = false
-            binding?.tvOnThisDaySnippet?.isVisible = false
-            binding?.tvOnThisDayEmpty?.isVisible = true
-        }
+//        // Use apply for cleaner access to binding properties
+//        binding?.apply {
+//            if (memory != null) {
+//                // --- Case 1: Memory Found ---
+//                // Set the details from the found memory
+//                tvOnThisDayTitle.text = memory.title
+//                tvOnThisDayDate.text = memory.entryDate
+//                tvOnThisDaySnippet.text = memory.storyContent
+//
+//                // Show the detail views and hide the empty message view
+//                tvOnThisDayTitle.isVisible = true
+//                tvOnThisDayDate.isVisible = true
+//                tvOnThisDaySnippet.isVisible = true
+//                tvOnThisDayEmpty.isVisible = false
+//            } else {
+//
+//            }
+//        }
     }
-
     private fun generateWeeklySummary() {
         val weekAgo = Calendar.getInstance()
         weekAgo.add(Calendar.DAY_OF_YEAR, -7)

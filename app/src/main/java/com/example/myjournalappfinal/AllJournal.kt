@@ -5,29 +5,37 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myjournalappfinal.Adapters.JournalAdapter
 import com.example.myjournalappfinal.Interfaces.JournalInteractionListener
 import com.example.myjournalappfinal.Models.JournalEntry
 import com.example.myjournalappfinal.databinding.DeleteDialogBindingBinding
+import com.example.myjournalappfinal.databinding.FragmentAllJournalBinding
 import com.example.myjournalappfinal.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import java.util.Calendar
 
-class HomeFragment : Fragment(), JournalInteractionListener {
+// TODO: Rename parameter arguments, choose names that match
+// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
 
-    private var binding: FragmentHomeBinding? = null
+/**
+ * A simple [Fragment] subclass.
+ * Use the [AllJournal.newInstance] factory method to
+ * create an instance of this fragment.
+ */
+class AllJournal : Fragment(), JournalInteractionListener {
+    private var binding: FragmentAllJournalBinding? = null
     private lateinit var journalAdapter: JournalAdapter
     private val journalList = ArrayList<JournalEntry>()
 
@@ -35,57 +43,16 @@ class HomeFragment : Fragment(), JournalInteractionListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        binding = FragmentAllJournalBinding.inflate(inflater, container, false)
         return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // This function now handles both the name and the time-based greeting
-        setupGreeting()
-
         setupRecyclerView()
         fetchJournalEntries()
 
-        binding?.viewall?.setOnClickListener {
-            findNavController().navigate(R.id.allJournal)
-        }
 
-        binding?.btnadd?.setOnClickListener {
-            if (FirebaseAuth.getInstance().currentUser != null) {
-                findNavController().navigate(R.id.imageUploadFragment)
-            } else {
-                Toast.makeText(requireContext(), "You must be logged in to create an entry.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private fun setupGreeting() {
-        // --- Part 1: Set user's name (existing logic) ---
-        val user = FirebaseAuth.getInstance().currentUser
-        if (user != null) {
-            val displayName = user.displayName
-            if (!displayName.isNullOrBlank()) {
-                val firstName = displayName.split(" ").first()
-                binding?.hi?.text = "Hi $firstName!"
-            } else {
-                binding?.hi?.text = "Hi there!"
-            }
-        }
-
-        // --- Part 2: Set greeting based on time of day (new logic) ---
-        val calendar = Calendar.getInstance()
-        val hour = calendar.get(Calendar.HOUR_OF_DAY) // Get hour in 24-hour format
-
-        val greetingMessage = when (hour) {
-            in 0..11 -> "Good Morning "
-            in 12..17 -> "Good Afternoon "
-            in 18..21 -> "Good Evening "
-            else -> "Good Night "
-        }
-
-        binding?.txtgreetings?.text = greetingMessage
     }
 
     private fun setupRecyclerView() {
@@ -96,12 +63,15 @@ class HomeFragment : Fragment(), JournalInteractionListener {
         }
     }
 
+    // ✅ This is correct. You are using directions from your current location.
     override fun onItemClick(journalEntry: JournalEntry) {
-        val action = HomeFragmentDirections.actionHomeFragmentToUpdateJournalFragment(journalEntry)
+        val action = AllJournalDirections.actionAllJournalToUpdateJournalFragment(journalEntry)
         findNavController().navigate(action)
     }
 
+    // --- THIS IS THE CORRECTED METHOD ---
     override fun onItemLongClick(journalEntry: JournalEntry) {
+        // This method now correctly calls the one below without extra code.
         showDeleteConfirmationDialog(journalEntry)
     }
 
@@ -112,13 +82,18 @@ class HomeFragment : Fragment(), JournalInteractionListener {
         val dialogBinding = DeleteDialogBindingBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
 
-        dialogBinding.btnNo.setOnClickListener { dialog.dismiss() }
+        dialogBinding.btnNo.setOnClickListener {
+            dialog.dismiss()
+        }
+
         dialogBinding.btnYes.setOnClickListener {
             deleteJournalEntry(journalEntry)
             dialog.dismiss()
         }
 
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        // --- THIS IS THE CORRECTED PLACEMENT ---
+        // Set the dialog size to match the parent's width and wrap content height
         dialog.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         dialog.show()
     }
@@ -164,14 +139,14 @@ class HomeFragment : Fragment(), JournalInteractionListener {
                 if (snapshots != null && !snapshots.isEmpty) {
                     binding?.tvNoEntries?.isVisible = false
                     binding?.rvJournalEntries?.isVisible = true
-                    val newEntries = snapshots.map { doc ->
-                        doc.toObject(JournalEntry::class.java).apply { id = doc.id }
-                    }
+
+                    val newEntries = snapshots.toObjects(JournalEntry::class.java)
                     journalAdapter.updateData(newEntries)
                 } else {
                     binding?.tvNoEntries?.isVisible = true
                     binding?.rvJournalEntries?.isVisible = false
                     journalAdapter.updateData(emptyList())
+                    Log.d("HomeFragment", "Current data: null or empty")
                 }
             }
     }

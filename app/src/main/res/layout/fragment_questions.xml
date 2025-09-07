@@ -7,7 +7,6 @@
     android:padding="24dp"
     tools:context=".QuestionsFragment">
 
-    <!-- Displays the current question number, e.g., "Question 1 of 5" -->
     <TextView
         android:id="@+id/tvQuestionCounter"
         android:layout_width="wrap_content"
@@ -19,7 +18,6 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Question 1 of 5" />
 
-    <!-- Displays the actual question text -->
     <TextView
         android:id="@+id/tvQuestionText"
         android:layout_width="0dp"
@@ -34,7 +32,6 @@
         app:layout_constraintTop_toBottomOf="@id/tvQuestionCounter"
         tools:text="What was the most memorable part of your day and why did it stand out to you?" />
 
-    <!-- Input field for the user's answer -->
     <EditText
         android:id="@+id/etAnswer"
         android:layout_width="0dp"
@@ -48,25 +45,106 @@
         android:inputType="textMultiLine|textCapSentences"
         android:padding="16dp"
         android:textColor="?android:attr/textColorPrimary"
-        app:layout_constraintBottom_toTopOf="@id/btnNextFinish"
+        app:layout_constraintBottom_toTopOf="@+id/nextSkip"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvQuestionText" />
 
-    <!-- Button to proceed to the next question or finish the journal entry -->
-    <Button
-        android:id="@+id/btnNextFinish"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/nextSkip"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="@string/next"
-        android:textSize="18sp"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
 
-    <!-- Loading indicator shown while the AI is generating the story -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSkip"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Skip" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNextFinish"
+            android:layout_width="0dp"
+            android:backgroundTint="@color/green"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:text="@string/next" />
+
+    </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tvReviewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Review Your Story"
+        android:fontFamily="@font/circularstd_bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="24sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible"/>
+
+    <EditText
+        android:id="@+id/etStoryPreview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:padding="16dp"
+        android:gravity="top|start"
+        android:hint="Your story will appear here..."
+        android:inputType="textMultiLine|textCapSentences"
+        android:background="@drawable/recylerview_background_banner"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tvReviewTitle"
+        app:layout_constraintBottom_toTopOf="@+id/llReviewButtons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/llReviewButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:visibility="visible">
+
+        <com.google.android.material.button.MaterialButton
+            android:textColor="@color/black"
+            android:id="@+id/btnRegenerateStory"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:visibility="visible"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Regenerate" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSaveStory"
+            android:layout_width="0dp"
+            android:backgroundTint="@color/blue"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:text="Save" />
+    </LinearLayout>
+
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleLarge"

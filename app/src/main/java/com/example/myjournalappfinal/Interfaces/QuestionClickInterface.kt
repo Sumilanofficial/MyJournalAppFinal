@@ -1,4 +1,4 @@
-package com.example.myjournalappfinal
+package com.example.myjournalappfinal.Interfaces
 
 interface QuestionClickInterface {
 

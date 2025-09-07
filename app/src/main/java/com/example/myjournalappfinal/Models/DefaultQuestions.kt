@@ -1,5 +1,4 @@
-import com.example.myjournalappfinal.QuestionsEntities
-import kotlin.ranges.until
+package com.example.myjournalappfinal.Models
 
 object DefaultQuestions {
     private val questionsList = arrayListOf(

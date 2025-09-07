@@ -1,21 +1,18 @@
 package com.example.myjournalappfinal
 
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
+import com.example.myjournalappfinal.Auth.LoginActivity
 import com.example.myjournalappfinal.databinding.FragmentProfileBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.UserProfileChangeRequest
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -24,7 +21,6 @@ class ProfileFragment : Fragment() {
 
     private var binding: FragmentProfileBinding? = null
     private val auth = FirebaseAuth.getInstance()
-    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,105 +32,119 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        handleWindowInsets()
         setupUserData()
-        fetchUserStats()
         setupListeners()
     }
-
-//    private fun handleWindowInsets() {
-//        ViewCompat.setOnApplyWindowInsetsListener(binding!!.root) { _, windowInsets ->
-//            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-//            // Apply top padding to the collapsing toolbar to account for the status bar
-////            binding?.appBarLayout?.updatePadding(top = insets.top)
-//            // Apply bottom padding to the scroll view to account for the navigation bar
-//            binding?.nestedScrollView?.updatePadding(bottom = insets.bottom)
-//            WindowInsetsCompat.CONSUMED
-//        }
-//    }
 
     private fun setupUserData() {
         val user = auth.currentUser
         if (user != null) {
-            binding?.tvUserName?.text = user.displayName ?: "Journalist"
+            // ✅ CHANGED: Set the text for the new tvUserName view
+            binding?.tvUserName?.text = user.displayName?.takeIf { it.isNotBlank() } ?: "Journalist"
             binding?.tvUserEmail?.text = user.email
 
-            // Set "Member Since" text by formatting the user's creation timestamp
             val creationTimestamp = user.metadata?.creationTimestamp
             if (creationTimestamp != null) {
                 val sdf = SimpleDateFormat("MMM yyyy", Locale.getDefault())
                 binding?.tvMemberSince?.text = "Member since ${sdf.format(Date(creationTimestamp))}"
             }
-
-            Glide.with(this)
-                .load(user.photoUrl)
-                .placeholder(R.drawable.profile_circle_svgrepo_com) // A default avatar
-                .into(binding!!.ivProfilePicture)
         }
-    }
-
-    private fun fetchUserStats() {
-        val userId = auth.currentUser?.uid
-        if (userId == null) {
-            binding?.tvJournalCount?.text = "0"
-            binding?.tvDaysStreak?.text = "0" // Default streak
-            return
-        }
-
-        db.collection("users").document(userId)
-            .collection("journals")
-            .get()
-            .addOnSuccessListener { documents ->
-                binding?.tvJournalCount?.text = documents.size().toString()
-                // You can add more complex logic here for day streaks, etc.
-                binding?.tvDaysStreak?.text = "3" // Placeholder for streak
-            }
-            .addOnFailureListener {
-                binding?.tvJournalCount?.text = "N/A"
-                binding?.tvDaysStreak?.text = "N/A"
-            }
     }
 
     private fun setupListeners() {
-        // --- LOGOUT BUTTON ---
         binding?.btnLogout?.setOnClickListener {
             auth.signOut()
             Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
-            // Navigate to login screen and clear back stack
             val intent = Intent(requireActivity(), LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             requireActivity().finish()
         }
 
-        // --- NOTIFICATIONS ---
-        binding?.tvNotifications?.setOnClickListener {
-            Toast.makeText(requireContext(), "Notification settings coming soon!", Toast.LENGTH_SHORT).show()
+        // ✅ ADDED: Listener to open the change name dialog
+        binding?.txtChangeName?.setOnClickListener {
+            showChangeNameDialog()
         }
 
-        // --- THEME SWITCHER LOGIC ---
-        // Set initial state of the switch based on current app theme
-        when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-            Configuration.UI_MODE_NIGHT_YES -> binding?.switchDarkMode?.isChecked = true
-            Configuration.UI_MODE_NIGHT_NO -> binding?.switchDarkMode?.isChecked = false
-            else -> binding?.switchDarkMode?.isChecked = false // Default to light if undefined
-        }
-
-        // Add a listener to handle theme changes when the switch is toggled
-        binding?.switchDarkMode?.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                // Switch to Dark Mode
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                // Switch to Light Mode
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
+        // ✅ ADDED: Listener to open the change password dialog
+        binding?.txtChangePassword?.setOnClickListener {
+            showChangePasswordConfirmationDialog()
         }
     }
+
+    // --- ✅ NEW FUNCTIONS FOR NEW FEATURES ---
+
+    private fun showChangeNameDialog() {
+        val user = auth.currentUser ?: return
+        val editText = EditText(requireContext()).apply {
+            setText(user.displayName)
+            hint = "Enter your new name"
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Change Name")
+            .setView(editText)
+            .setPositiveButton("Save") { _, _ ->
+                val newName = editText.text.toString().trim()
+                if (newName.isNotEmpty()) {
+                    updateUserName(newName)
+                } else {
+                    Toast.makeText(requireContext(), "Name cannot be empty.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun updateUserName(newName: String) {
+        val user = auth.currentUser ?: return
+        val profileUpdates = UserProfileChangeRequest.Builder()
+            .setDisplayName(newName)
+            .build()
+
+        user.updateProfile(profileUpdates)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(requireContext(), "Name updated successfully.", Toast.LENGTH_SHORT).show()
+                    // Refresh the UI with the new name
+                    binding?.tvUserName?.text = newName
+                } else {
+                    Toast.makeText(requireContext(), "Failed to update name: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun showChangePasswordConfirmationDialog() {
+        val userEmail = auth.currentUser?.email
+        if (userEmail == null) {
+            Toast.makeText(requireContext(), "Could not find user email.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Change Password")
+            .setMessage("A password reset link will be sent to your email address:\n\n$userEmail")
+            .setPositiveButton("Send Email") { _, _ ->
+                sendPasswordResetEmail(userEmail)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun sendPasswordResetEmail(email: String) {
+        auth.sendPasswordResetEmail(email)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(requireContext(), "Password reset email sent.", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Failed to send email: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
     }
 }
-

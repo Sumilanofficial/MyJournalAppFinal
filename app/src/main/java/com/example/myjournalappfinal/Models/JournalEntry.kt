@@ -1,15 +1,15 @@
-package com.example.myjournalappfinal
+package com.example.myjournalappfinal.Models
 
 import android.os.Parcelable
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.ServerTimestamp
-import java.util.Date
 import kotlinx.parcelize.Parcelize
+import java.util.Date
 
 @Parcelize // Add this annotation to make the class Parcelable
 data class JournalEntry(
     // This annotation automatically gets the document ID from Firestore
-    @DocumentId val id: String = "",
+    @DocumentId var id: String = "",
     val userId: String = "",
     val title: String = "",
     val storyContent: String = "",

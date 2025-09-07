@@ -1,98 +1,121 @@
 package com.example.myjournalappfinal
 
-import DefaultQuestions
 import android.app.Dialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.myjournalappfinal.Adapters.QuestionsAdapter
+import com.example.myjournalappfinal.Interfaces.QuestionClickInterface
+import com.example.myjournalappfinal.Models.QuestionsEntities
+import com.example.myjournalappfinal.Models.SharedViewModel
 import com.example.myjournalappfinal.databinding.CustomAddquestionDialogbindingBinding
 import com.example.myjournalappfinal.databinding.FragmentQuestionsPreferenceBinding
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 import com.google.gson.Gson
-import kotlin.jvm.java
+import kotlinx.coroutines.launch
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [QuestionsPreferenceFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class
-QuestionsPreferenceFragment : Fragment(), QuestionClickInterface {
+class QuestionsPreferenceFragment : Fragment(), QuestionClickInterface {
     private var binding: FragmentQuestionsPreferenceBinding? = null
     private lateinit var questionsList: ArrayList<QuestionsEntities>
     private var questionsAdapter: QuestionsAdapter? = null
-    private var mainActivity: MainActivity? = null
-
-    // Declare sharedViewModel as a lateinit var
     private lateinit var sharedViewModel: SharedViewModel
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        mainActivity = activity as? MainActivity
-    }
+
+    private val generativeModel = Firebase.ai(backend = GenerativeBackend.googleAI())
+        .generativeModel("gemini-2.5-flash")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentQuestionsPreferenceBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding!!.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
-        questionsList = DefaultQuestions.getDefaultQuestions()
+
+        questionsList = ArrayList()
         questionsAdapter = QuestionsAdapter(requireContext(), questionsList, this)
         binding?.recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         binding?.recyclerView?.adapter = questionsAdapter
 
+        generateQuestionsWithAI()
+
         binding?.next?.setOnClickListener {
-            if(questionsList.isEmpty()){
-                Toast.makeText(requireContext(), resources.getString(R.string.add_questions), Toast.LENGTH_SHORT).show()
+            if (questionsList.isEmpty()) {
+                Toast.makeText(requireContext(), "Please wait for questions to generate.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             val txttitle = binding?.etTitle?.text.toString().trim()
+            if (txttitle.isEmpty()) {
+                Toast.makeText(requireContext(), "Please enter a title for your journal.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             sharedViewModel.title = txttitle
-            var questionsListArray = QuestionsList()
+            val questionsListArray = QuestionsList()
             questionsListArray.questionsList?.addAll(questionsList)
-            var bundle = Bundle()
+            val bundle = Bundle()
             bundle.putString("questions", Gson().toJson(questionsListArray))
-            findNavController().navigate(R.id.action_questionsPreferenceFragment_to_imageUploadFragment, bundle)
+
+            // ✅ CHANGED: Navigate to the final question answering screen.
+            // Make sure this action is defined in your nav_graph.xml
+            findNavController().navigate(R.id.questionsFragment, bundle)
         }
 
         binding?.addQuestion?.setOnClickListener {
-            // Handle adding a new question
-            val customAddQuestionDialogBinding = CustomAddquestionDialogbindingBinding.inflate(layoutInflater)
-            Dialog(requireContext()).apply {
-                setContentView(customAddQuestionDialogBinding.root)
-                window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-                show()
+            // ... (Your code for adding a manual question)
+        }
 
-                customAddQuestionDialogBinding.add.setOnClickListener {
-                    val newQuestionText = customAddQuestionDialogBinding.editText.text.trim().toString()
-                    if (newQuestionText.isNotEmpty()) {
-                        val newQuestion = QuestionsEntities(newQuestionText)
-                        //commented this as there is no need to add questions in the default list
-//                            DefaultQuestions.addNewQuestion(newQuestion)
-                        questionsList.add(newQuestion)
-                        questionsAdapter?.notifyDataSetChanged()
-                        dismiss()
-                    }
-                }
+        binding?.btnRegenerate?.setOnClickListener {
+            generateQuestionsWithAI()
+        }
+    }
+
+    private fun generateQuestionsWithAI() {
+        binding?.progressBar?.isVisible = true
+        binding?.next?.isEnabled = false
+        binding?.btnRegenerate?.isEnabled = false
+
+        val prompt = "Generate 5 short and simple one-sentence questions for a daily journal. The questions should be easy to answer. Provide them as a simple numbered list."
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val response = generativeModel.generateContent(prompt)
+                val generatedQuestions = parseQuestions(response.text ?: "")
+                questionsList.clear()
+                questionsList.addAll(generatedQuestions)
+                questionsAdapter?.notifyDataSetChanged()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Error generating questions: ${e.message}", Toast.LENGTH_LONG).show()
+            } finally {
+                binding?.progressBar?.isVisible = false
+                binding?.next?.isEnabled = true
+                binding?.btnRegenerate?.isEnabled = true
             }
         }
     }
 
-    override fun onPause() {
-        super.onPause()
+    private fun parseQuestions(responseText: String): ArrayList<QuestionsEntities> {
+        val parsedList = ArrayList<QuestionsEntities>()
+        val lines = responseText.split("\n")
+        for (line in lines) {
+            val questionText = line.replaceFirst(Regex("^\\d+\\.\\s*"), "").trim()
+            if (questionText.isNotEmpty()) {
+                parsedList.add(QuestionsEntities(questionText))
+            }
+        }
+        return parsedList
     }
 
     override fun showDelete(position: Int) {
@@ -101,17 +124,11 @@ QuestionsPreferenceFragment : Fragment(), QuestionClickInterface {
     }
 
     override fun showEdit(position: Int) {
-        // Handle edit functionality if needed
+        // Handle edit functionality
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            QuestionsPreferenceFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
     }
 }

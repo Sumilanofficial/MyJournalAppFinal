@@ -1,4 +1,4 @@
-package com.example.myjournalappfinal
+package com.example.myjournalappfinal.Adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +7,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.myjournalappfinal.Models.JournalEntry
+import com.example.myjournalappfinal.Interfaces.JournalInteractionListener
+import com.example.myjournalappfinal.R
 
 class JournalAdapter(
     private var journalList: ArrayList<JournalEntry>,
@@ -16,9 +19,10 @@ class JournalAdapter(
 
     class JournalViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.tvJournalTitle)
-        val date: TextView = itemView.findViewById(R.id.tvJournalDate)
+        val entryDate: TextView = itemView.findViewById(R.id.tvJournalDate)
         val description: TextView = itemView.findViewById(R.id.tvJournalDescription)
         val image1: ImageView = itemView.findViewById(R.id.ivJournalImage1)
+        val entryTime: TextView = itemView.findViewById(R.id.txtdate)
         val image2: ImageView = itemView.findViewById(R.id.ivJournalImage2)
     }
 
@@ -36,7 +40,8 @@ class JournalAdapter(
         val model = journalList[position]
 
         holder.title.text = model.title
-        holder.date.text = "${model.entryDate} • ${model.entryTime}"
+        holder.entryDate.text = "${model.entryTime}"
+        holder.entryTime.text="${model.entryDate}"
         holder.description.text = model.storyContent
 
         // Use Glide to load images
@@ -72,4 +77,3 @@ class JournalAdapter(
         notifyDataSetChanged()
     }
 }
-

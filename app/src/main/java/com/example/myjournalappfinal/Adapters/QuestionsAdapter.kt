@@ -1,5 +1,4 @@
-package com.example.myjournalappfinal
-
+package com.example.myjournalappfinal.Adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -8,6 +7,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myjournalappfinal.Interfaces.QuestionClickInterface
+import com.example.myjournalappfinal.Models.QuestionsEntities
+import com.example.myjournalappfinal.R
 
 class QuestionsAdapter(
     var context: Context,
@@ -18,7 +20,7 @@ class QuestionsAdapter(
     private var selectedItemPosition: Int = -1
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        var txtQuestion: TextView = view.findViewById(R.id.txtquestion)
+        var txtQuestion: TextView = view.findViewById(R.id.tvJournalDescription)
         var txtQuestionNo: TextView = view.findViewById(R.id.txtquestionNo)
         var btnedit: Button = view.findViewById(R.id.btnEdit)
         var btndelete: Button = view.findViewById(R.id.btnDelete)

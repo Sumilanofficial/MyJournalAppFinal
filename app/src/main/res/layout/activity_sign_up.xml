@@ -4,17 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".SignUpActivity">
+    tools:context=".Auth.SignUpActivity">
 
     <!-- Back Button -->
-    <ImageView
-        android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:src="@android:drawable/ic_media_previous"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+<!--    <ImageView-->
+<!--        android:id="@+id/backButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:padding="16dp"-->
+<!--        android:src="@android:drawable/ic_media_previous"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"/>-->
     <!--            android:contentDescription="@string/back_button" />-->
 
     <!-- Create Account Title -->
@@ -156,6 +156,7 @@
         android:padding="14dp"
         android:text="Sign Up"
         android:textSize="16sp"
+        android:backgroundTint="@color/blue"
         app:cornerRadius="8dp"
         app:layout_constraintEnd_toEndOf="@id/confirmPasswordInputLayout"
         app:layout_constraintStart_toStartOf="@id/confirmPasswordInputLayout"

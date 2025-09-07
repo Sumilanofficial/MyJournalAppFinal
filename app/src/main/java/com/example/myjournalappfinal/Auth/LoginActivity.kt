@@ -1,105 +1,136 @@
-package com.example.myjournalappfinal
-
+package com.example.myjournalappfinal.Auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
+import android.view.View
 import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-
+import com.example.myjournalappfinal.MainActivity
+import com.example.myjournalappfinal.Auth.SignUpActivity
 import com.example.myjournalappfinal.databinding.ActivityLoginBinding
-import com.google.firebase.Firebase
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
-
+import com.google.firebase.auth.GoogleAuthProvider
 
 class LoginActivity : AppCompatActivity() {
 
-    // Declare the ViewBinding and FirebaseAuth variables
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
+    private lateinit var googleSignInClient: GoogleSignInClient
+
+    // ActivityResultLauncher for the Google Sign-In flow
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
+                Log.d("LoginActivity", "firebaseAuthWithGoogle:" + account.id)
+                firebaseAuthWithGoogle(account.idToken!!)
+            } catch (e: ApiException) {
+                Log.w("LoginActivity", "Google sign in failed", e)
+                Toast.makeText(this, "Google Sign-In failed.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize Firebase Auth
-        auth = Firebase.auth
+        auth = FirebaseAuth.getInstance()
 
-        // Set up click listener for the Login button
-        binding.loginButton.setOnClickListener {
-            loginUser()
-        }
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("937802809670-e1a694mf1lkigq57ussq49trdruk140l.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
 
-        // Set up click listener for the "Sign Up" text
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
+
+        binding.loginButton.setOnClickListener { loginUser() }
         binding.signupTextView.setOnClickListener {
-            val intent = Intent(this, SignUpActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, SignUpActivity::class.java))
         }
-
-        // Set up click listener for "Forgot Password"
-        binding.forgotPasswordTextView.setOnClickListener {
-            showForgotPasswordDialog()
-        }
+        binding.forgotPasswordTextView.setOnClickListener { showForgotPasswordDialog() }
+        binding.btnGoogle.setOnClickListener { signInWithGoogle() }
     }
 
     override fun onStart() {
         super.onStart()
-        // Check if user is signed in (and verified) and update UI accordingly.
         val currentUser = auth.currentUser
-        if (currentUser != null && currentUser.isEmailVerified) {
-            // If user is already logged in and verified, go to MainActivity
+        if (currentUser != null) {
             navigateToMainActivity()
         }
+    }
+
+    private fun showLoading(show: Boolean) {
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    private fun signInWithGoogle() {
+        val signInIntent = googleSignInClient.signInIntent
+        googleSignInLauncher.launch(signInIntent)
+    }
+
+    private fun firebaseAuthWithGoogle(idToken: String) {
+        showLoading(true)
+
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener(this) { task ->
+                showLoading(false)
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "Google Sign-In Successful.", Toast.LENGTH_SHORT).show()
+                    navigateToMainActivity()
+                } else {
+                    Toast.makeText(this, "Authentication Failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun loginUser() {
         val email = binding.emailEditText.text.toString().trim()
         val password = binding.passwordEditText.text.toString().trim()
 
-        // Validate input
         if (email.isEmpty()) {
             binding.emailInputLayout.error = "Email is required."
             return
-        } else {
-            binding.emailInputLayout.error = null
-        }
+        } else binding.emailInputLayout.error = null
 
         if (password.isEmpty()) {
             binding.passwordInputLayout.error = "Password is required."
             return
-        } else {
-            binding.passwordInputLayout.error = null
-        }
+        } else binding.passwordInputLayout.error = null
 
-        // Sign in with Firebase
+        showLoading(true)
+
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
+                showLoading(false)
                 if (task.isSuccessful) {
-                    // Sign in success
                     val user = auth.currentUser
-
-                    // CRUCIAL: Check if the user's email is verified
                     if (user != null && user.isEmailVerified) {
-                        Log.d("LoginActivity", "signInWithEmail:success")
                         Toast.makeText(baseContext, "Login Successful.", Toast.LENGTH_SHORT).show()
                         navigateToMainActivity()
                     } else {
-                        // If email is not verified, inform the user and sign them out
-                        Log.w("LoginActivity", "Login failed: Email not verified.")
                         Toast.makeText(baseContext, "Please verify your email address first.", Toast.LENGTH_LONG).show()
-                        auth.signOut() // Sign out to prevent unauthorized access
+                        auth.signOut()
                     }
                 } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w("LoginActivity", "signInWithEmail:failure", task.exception)
                     Toast.makeText(
                         baseContext,
                         "Authentication failed: ${task.exception?.message}",
-                        Toast.LENGTH_LONG,
+                        Toast.LENGTH_LONG
                     ).show()
                 }
             }
@@ -111,7 +142,7 @@ class LoginActivity : AppCompatActivity() {
 
         val input = EditText(this)
         input.hint = "Enter your email"
-        input.inputType = android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        input.inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
         builder.setView(input)
 
         builder.setPositiveButton("Send") { dialog, _ ->
@@ -144,7 +175,6 @@ class LoginActivity : AppCompatActivity() {
 
     private fun navigateToMainActivity() {
         val intent = Intent(this, MainActivity::class.java)
-        // Clear the back stack so the user can't press back to return to the login screen
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         startActivity(intent)
         finish()

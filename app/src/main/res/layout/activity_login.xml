@@ -4,19 +4,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".LoginActivity">
+    tools:context=".Auth.LoginActivity">
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
 
     <!-- App Logo Placeholder -->
-    <ImageView
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/logoImageView"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="60dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="35dp"
         android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/loginannimation" />
 
     <!-- Welcome Title -->
     <TextView
@@ -51,7 +64,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="32dp"
         android:hint="Email Address"
         app:boxCornerRadiusBottomEnd="8dp"
@@ -120,6 +133,7 @@
         android:layout_marginTop="24dp"
         android:padding="14dp"
         android:text="Login"
+        android:backgroundTint="@color/blue"
         android:textSize="16sp"
         app:cornerRadius="8dp"
         app:layout_constraintEnd_toEndOf="@id/passwordInputLayout"
@@ -171,15 +185,17 @@
         app:layout_constraintTop_toBottomOf="@id/dividerLayout">
         <!-- Placeholder for Google, Facebook buttons etc. -->
         <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="16dp"
-            android:contentDescription="Google Login"/>
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-
-            android:contentDescription="Facebook Login"/>
+            android:id="@+id/btnGoogle"
+            android:layout_width="57dp"
+            android:layout_height="61dp"
+            android:background="@drawable/round_google"
+            android:contentDescription="Password Icon"
+            android:src="@drawable/google_svgrepo_com"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView9"
+            app:layout_constraintVertical_bias="0.191" />
 
     </LinearLayout>
 
@@ -195,6 +211,7 @@
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/socialLoginLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

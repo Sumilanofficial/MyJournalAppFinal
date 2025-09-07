@@ -6,6 +6,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.myjournalappfinal.Auth.LoginActivity
+import com.example.myjournalappfinal.Auth.SignUpActivity
 import com.example.myjournalappfinal.databinding.ActivityWelcomeScreenBinding
 import com.google.firebase.auth.FirebaseAuth
 

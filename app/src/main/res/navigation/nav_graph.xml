@@ -48,7 +48,7 @@
         tools:layout="@layout/fragment_update_journal" >
         <argument
             android:name="journalEntry"
-            app:argType="com.example.myjournalappfinal.JournalEntry" />
+            app:argType="com.example.myjournalappfinal.Models.JournalEntry" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -60,5 +60,26 @@
         android:name="com.example.myjournalappfinal.InsightFragment"
         android:label="fragment_insight"
         tools:layout="@layout/fragment_insight" />
+    <fragment
+        android:id="@+id/allJournal"
+        android:name="com.example.myjournalappfinal.AllJournal"
+        android:label="fragment_all_journal"
+        tools:layout="@layout/fragment_all_journal">
+
+        <action
+            android:id="@+id/action_allJournal_to_updateJournalFragment"
+            app:destination="@id/updateJournalFragment">
+            <argument
+                android:name="journalEntry"
+                app:argType="com.example.myjournalappfinal.Models.JournalEntry" />
+        </action>
+
+    </fragment>
+    <fragment
+        android:id="@+id/freestyleFragment"
+        android:name="com.example.myjournalappfinal.FreestyleFragment"
+        android:label="fragment_freestyle"
+        tools:layout="@layout/fragment_freestyle" />
+
 </navigation>
 

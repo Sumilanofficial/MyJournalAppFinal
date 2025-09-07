@@ -1,5 +1,4 @@
-package com.example.myjournalappfinal
-
+package com.example.myjournalappfinal.Auth
 
 import android.os.Bundle
 import android.util.Log
@@ -37,9 +36,9 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         // Set up the back button listener
-        binding.backButton.setOnClickListener {
-            finish()
-        }
+//        binding.backButton.setOnClickListener {
+//            finish()
+//        }
     }
 
     /**

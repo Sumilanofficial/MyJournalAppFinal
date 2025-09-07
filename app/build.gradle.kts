@@ -44,6 +44,9 @@ android {
 
 dependencies {
     implementation(libs.firebase.firestore)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     val nav_version = "2.7.7"
 
     implementation(libs.androidx.core.ktx)
@@ -70,7 +73,8 @@ dependencies {
     // Navigation UI library for integrating with app bars, drawers, etc. (Kotlin KTX)
     implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
 
-    // Navigation UI library for integrating with app bars, drawers, etc. (Kotlin KTX)
-    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
+
+    // Add this for Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 
 }
