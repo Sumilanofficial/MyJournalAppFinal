@@ -68,9 +68,9 @@ class HomeFragment : Fragment(), JournalInteractionListener {
             val displayName = user.displayName
             if (!displayName.isNullOrBlank()) {
                 val firstName = displayName.split(" ").first()
-                binding?.hi?.text = "Hi $firstName!"
+                binding?.hi?.text = "Hi $firstName"
             } else {
-                binding?.hi?.text = "Hi there!"
+                binding?.hi?.text = "Hi there"
             }
         }
 
