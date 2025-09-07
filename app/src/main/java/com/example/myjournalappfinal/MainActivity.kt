@@ -9,7 +9,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
 import com.example.myjournalappfinal.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
 
@@ -62,12 +61,24 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
 
-        // Connect the BottomNavigationView with the NavController.
-        // This automatically handles navigation when menu items are tapped.
-        // IMPORTANT: For this to work, the menu item IDs in your `bottom_menu.xml`
-        // MUST match the destination fragment IDs in your `nav_graph.xml`.
-        // Example: The "Home" menu item should have an id of `R.id.homeFragment`.
-        binding.bottomNavigation.setupWithNavController(navController)
+        // ✅ MODIFIED: Replaced `setupWithNavController` with your requested manual listener.
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                // NOTE: The R.id names here must match your `bottom_menu.xml`
+                R.id.bottom_home ->
+                    navController.navigate(R.id.homeFragment)
+
+                R.id.bottom_insight ->
+                    navController.navigate(R.id.insightFragment)
+
+                R.id.bottom_jouranals -> // Make sure this ID is correct in your menu file
+                    navController.navigate(R.id.allJournal)
+
+                R.id.bottom_profile ->
+                    navController.navigate(R.id.profileFragment)
+            }
+            true // Return true to display the item as the selected item
+        }
 
         // Add a listener to show or hide the bottom navigation bar on specific fragments.
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -94,3 +105,4 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }
+
