@@ -1,9 +1,9 @@
 My Journal App: Your AI-Powered Journal
 My Journal App is a modern, feature-rich Android journaling application designed to transform daily reflection into a seamless and insightful experience. It leverages Generative AI to help you create rich, narrative-style journal entries from simple, guided questions, making it the perfect space to capture your thoughts, track your growth, and uncover meaningful insights about your life.
-
 <br>
 
 ✨ Key Features
+
 📝 AI-Powered Story Generation: Overcome writer's block. Simply answer a few customizable prompts, and our AI will weave your thoughts into a beautiful, cohesive journal entry.
 
 🧠 AI-Generated Weekly Insights: Receive a compassionate summary of your week's entries. The AI analyzes your writing to identify recurring themes and emotions, helping you understand yourself better.
@@ -33,11 +33,9 @@ Core Architecture:
 
 Single-Activity Architecture: Uses a single MainActivity to host all fragment destinations.
 
-MVVM (Model-View-ViewModel): A robust, scalable, and maintainable architectural pattern.
-
 Android Jetpack: A suite of libraries to help developers follow best practices.
 
-UI Layer:
+UI Layer (XML):
 
 View Binding: Safely access views without findViewById.
 
@@ -72,6 +70,11 @@ Cloudinary: For robust cloud-based image storage and delivery.
 🚀 Setup & Installation
 To build and run this project yourself, follow these steps:
 
+Clone the repository:
+
+Bash
+
+git clone [PASTE YOUR GITHUB REPO LINK HERE]
 Firebase Setup:
 
 Create a new project on the Firebase Console.
@@ -115,6 +118,7 @@ Open the project in Android Studio, let Gradle sync, and run the app on an emula
 <br>
 
 🌟 Future Enhancements
+
 Mood Tracking & Charting: Implement mood selection for each entry and visualize trends in the Insights screen.
 
 Advanced Search: Add full-text search capabilities to find specific entries.
